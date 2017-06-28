@@ -26,7 +26,6 @@ class RecordSoundsViewController: UIViewController, AVAudioRecorderDelegate{
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        print("viewWillAppear called!")
     }
 
     override func didReceiveMemoryWarning() {
@@ -35,10 +34,7 @@ class RecordSoundsViewController: UIViewController, AVAudioRecorderDelegate{
     }
 
     @IBAction func recordAudio(_ sender: AnyObject) {
-        recordingLabel.text = "Recording in progress"
-        stopRecordingButton.isEnabled = true
-        recordButton.isEnabled = false
-        
+        self.configureUI(isRecording: false)
         let dirPath = NSSearchPathForDirectoriesInDomains(.documentDirectory,.userDomainMask, true)[0] as String
         let recordingName = "recordedVoice.wav"
         let pathArray = [dirPath, recordingName]
@@ -56,10 +52,7 @@ class RecordSoundsViewController: UIViewController, AVAudioRecorderDelegate{
     }
 
     @IBAction func stopRecordin(_ sender: Any) {
-        print("stop recording button was pressed")
-        stopRecordingButton.isEnabled = false
-        recordButton.isEnabled = true
-        recordingLabel.text = "Tab to Record"
+        self.configureUI(isRecording: true)
         audioRecorder.stop()
         let audioSession = AVAudioSession.sharedInstance()
         try! audioSession.setActive(false)
@@ -68,8 +61,6 @@ class RecordSoundsViewController: UIViewController, AVAudioRecorderDelegate{
     func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
         if flag{
             performSegue(withIdentifier: "stopRecording", sender: audioRecorder.url)
-        } else {
-            print("recording was not successful")
         }
     }
     
@@ -78,6 +69,18 @@ class RecordSoundsViewController: UIViewController, AVAudioRecorderDelegate{
             let playSoundVC = segue.destination as! PlaySoundsViewController;
             let recordingAudioURL = sender as! URL
             playSoundVC.recordedAudioURL = recordingAudioURL
+        }
+    }
+    
+    func configureUI(isRecording: Bool) {
+        if ( isRecording){
+            recordingLabel.text = "Tab to Record"
+            stopRecordingButton.isEnabled = false
+            recordButton.isEnabled = true
+        } else {
+            recordingLabel.text = "Recording in progress"
+            stopRecordingButton.isEnabled = true
+            recordButton.isEnabled = false
         }
     }
 }
